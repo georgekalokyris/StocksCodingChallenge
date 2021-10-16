@@ -14,13 +14,26 @@ namespace StocksCodingChallenge
 
             Database db = new Database();
             db.AddStocksFromFile();
-            db.PrintAllStocks();
 
-            StockResults stockResults = new StockResults(db);
-            Console.WriteLine($"The lower price is: {stockResults.minPrice()}");
-            Console.WriteLine($"The highest price is: {stockResults.maxPrice()}");
-            Console.WriteLine($"Day with lower price: {stockResults.StockWithLowerPrice().Day}, Price on that day: {stockResults.StockWithLowerPrice().Price}");
-            Console.WriteLine($"Day with higher price: {stockResults.StockWithHigherPrice().Day}, Price on that day: {stockResults.StockWithHigherPrice().Price}");
+            Print print = new Print(db);
+
+            print.PrintAllStocks();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintHigherPrice();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintLowerPrice();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintHigherStock();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintLowerStock();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintStocksByPriceDesc();
+            Console.WriteLine("-----------------------------------------");
+            print.PrintStocksByPriceAsc();            
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("end");            
+            Console.WriteLine("-----------------------------------------");
+
 
             Console.ReadLine();
         }
@@ -61,7 +74,7 @@ namespace StocksCodingChallenge
 
             string[] stockPrices = stockText.Split(',');
 
-            foreach(var price in stockPrices)
+            foreach (var price in stockPrices)
             {
                 stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
             }
@@ -72,20 +85,14 @@ namespace StocksCodingChallenge
             return new Stock(day, price);
         }
 
-        public void PrintAllStocks()
-        {
-            foreach (Stock stock in stocks)
-            {
-                Console.WriteLine($"Stock Day: {stock.Day} - Stock Price: {stock.Price}");
-            }
-        }
+        
     }
 
     public class StockResults
     {
-        public double minPrice() => db.stocks.Select(x=>x.Price).Min<double>();
-        public double maxPrice() => db.stocks.Select(x=>x.Price).Max<double>();
-        
+        public double minPrice() => db.stocks.Select(x => x.Price).Min<double>();
+        public double maxPrice() => db.stocks.Select(x => x.Price).Max<double>();
+
         public Stock StockWithHigherPrice()
         {
             return db.stocks.Where(x => x.Price == maxPrice()).First();
@@ -95,6 +102,18 @@ namespace StocksCodingChallenge
             return db.stocks.Where(x => x.Price == minPrice()).First();
         }
 
+        public List<Stock> StocksByPriceAsc()
+        {
+            return db.stocks.OrderBy(x => x.Price).ToList();
+        }
+
+        public List<Stock> StocksByPriceDesc()
+        {
+            return db.stocks.OrderByDescending(x => x.Price).ToList();
+        }
+
+
+
         public static Database db;
 
         public StockResults(Database database)
@@ -103,11 +122,73 @@ namespace StocksCodingChallenge
         }
 
 
-        
     }
+
+    public class Print
+    {
+
+        public void PrintAllStocks()
+        {
+            Console.WriteLine("Printing all Stocks as read from database");
+            foreach (Stock stock in data.stocks)
+            {
+                Console.WriteLine($"Stock Day: {stock.Day} - Stock Price: {stock.Price}");
+            }
+        }
+        public void PrintLowerPrice()
+        {
+            Console.WriteLine($"The lower price is: {stockResults.minPrice()}");
+        }
+
+        public void PrintHigherPrice()
+        {
+            Console.WriteLine($"The highest price is: {stockResults.maxPrice()}");
+        }
+
+        public void PrintLowerStock()
+        {
+            Console.WriteLine($"Day with lower price: {stockResults.StockWithLowerPrice().Day}, Price on that day: {stockResults.StockWithLowerPrice().Price}"); 
+        }
+
+        public void PrintHigherStock()
+        {
+            Console.WriteLine($"Day with higher price: {stockResults.StockWithHigherPrice().Day}, Price on that day: {stockResults.StockWithHigherPrice().Price}");
+        }
+
+        public void PrintStocksByPriceAsc()
+        {
+            Console.WriteLine("Printing all stocks by Price Ascending \n ");
+            foreach (var stock in stockResults.StocksByPriceAsc())
+            {
+                Console.WriteLine($"Price {stock.Price}, Day {stock.Day}");
+            }
+        }
+
+        public void PrintStocksByPriceDesc()
+        {
+            Console.WriteLine("Printing all stocks by Price Descending \n ");
+
+            foreach (var stock in stockResults.StocksByPriceDesc())
+            {
+                Console.WriteLine($"Price {stock.Price}, Day {stock.Day}");
+            }
+        }
+
+
+        public static Database data;
+
+        StockResults stockResults = new StockResults(data);
+
+        public Print(Database db)
+        {
+            data = db;
+        }
+
+    }
+
+}
 
 
 
     //TOOO: Investment Strategy
 
-}
