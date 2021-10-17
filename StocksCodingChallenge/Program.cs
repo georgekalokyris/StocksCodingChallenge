@@ -12,11 +12,15 @@ namespace StocksCodingChallenge
         static void Main(string[] args)
         {
 
+
             Database db = new Database();
             db.AddStocksFromFile();
+            StockResults stockResults = new StockResults(db);
+            InvestmentStrategies investments = new InvestmentStrategies(stockResults);
+            Print print = new Print(stockResults);
 
-            Print print = new Print(db);
-
+            print.NumberOfStocks();
+            Console.WriteLine("-----------------------------------------");
             print.PrintAllStocks();
             Console.WriteLine("-----------------------------------------");
             print.PrintHigherPrice();
@@ -29,13 +33,19 @@ namespace StocksCodingChallenge
             Console.WriteLine("-----------------------------------------");
             print.PrintStocksByPriceDesc();
             Console.WriteLine("-----------------------------------------");
-            print.PrintStocksByPriceAsc();            
+            print.PrintStocksByPriceAsc();
             Console.WriteLine("-----------------------------------------");
-            Console.WriteLine("end");            
+            Console.WriteLine("end");
             Console.WriteLine("-----------------------------------------");
+            investments.BuyOneSellOne();
 
+            Console.WriteLine("Please provide the path or press x for defualt");
+            string newPath = Console.ReadLine();
+            Console.WriteLine(newPath);
 
             Console.ReadLine();
+
+             
         }
 
     }
@@ -85,11 +95,14 @@ namespace StocksCodingChallenge
             return new Stock(day, price);
         }
 
+        //TODO: CRUD on Stock
+
         
     }
 
     public class StockResults
     {
+        public int TotalStocks() => db.stocks.Count();
         public double minPrice() => db.stocks.Select(x => x.Price).Min<double>();
         public double maxPrice() => db.stocks.Select(x => x.Price).Max<double>();
 
@@ -113,24 +126,25 @@ namespace StocksCodingChallenge
         }
 
 
-
-        public static Database db;
-
+        public Database db;
+        
         public StockResults(Database database)
         {
             db = database;
         }
 
-
     }
 
     public class Print
     {
-
+        public void NumberOfStocks()
+        {
+            Console.WriteLine($"Total number of stocks read from the database: {stockResults.TotalStocks()}");
+        }
         public void PrintAllStocks()
         {
-            Console.WriteLine("Printing all Stocks as read from database");
-            foreach (Stock stock in data.stocks)
+            Console.WriteLine("Printing all Stocks as read from data source");
+            foreach (Stock stock in stockResults.db.stocks)
             {
                 Console.WriteLine($"Stock Day: {stock.Day} - Stock Price: {stock.Price}");
             }
@@ -175,20 +189,101 @@ namespace StocksCodingChallenge
         }
 
 
-        public static Database data;
+        StockResults stockResults;
 
-        StockResults stockResults = new StockResults(data);
-
-        public Print(Database db)
+        public Print(StockResults stockResults)
         {
-            data = db;
+            this.stockResults = stockResults;
         }
 
+    }
+
+    struct BuyStockSellStock
+    {
+        public Stock buyStock;
+        public Stock sellStock;
+    }
+
+    class InvestmentStrategies
+    {
+        public double Profit;
+        //Default requirement for buying a single stock and then selling it at the highest possible price
+        
+        public void BuyOneSellOne()
+        {
+            //Find the Stock with the Lowest Price
+            Stock buyStock = stockResults.StockWithLowerPrice();
+            //Find the Stock with the Higher Price
+            Stock sellStock = stockResults.StockWithHigherPrice();
+           
+            //while (!(buyStock.Day < sellStock.Day))
+            //{
+            //    int buyIndex = 1;
+            //    int sellIndex = 1;
+
+            //    if(buyStock.Day < stockResults.db.stocks.Count)
+            //    {
+            //        buyStock = stockResults.StocksByPriceAsc()[buyIndex++];
+            //        possibleProfitA = sellStock.Price - buyStock.Price;
+            //    }
+            //    else
+            //    {
+            //        buyStock = stockResults.StockWithLowerPrice();
+            //        sellStock = stockResults.StocksByPriceDesc()[sellIndex++];
+            //        possibleProfitB = sellStock.Price - buyStock.Price;
+
+            //    }
+            //    //sellStock = stockResults.StocksByPriceDesc()[sellIndex++];
+            //}
+
+            double maxDiff = 0;
+            int buyDay = 0;
+            int sellDay = 0;
+            for (int i = 0; i < stockResults.db.stocks.Count(); i++) //Buy
+            {
+                
+                for (int j = i+1; j < stockResults.db.stocks.Count(); j++) //Sell
+                {
+                    double diff = stockResults.db.stocks[j].Price - stockResults.db.stocks[i].Price;
+                    
+
+                    //if (maxDiff < diff) maxDiff = diff; buyDay = i; sellDay = j;
+
+                    if (maxDiff < diff)
+                    {
+                        maxDiff = diff;
+                        buyDay = i+1;
+                        sellDay = j+1;
+                    }
+
+                    Console.WriteLine($"Profit: Buy Day: {stockResults.db.stocks[i].Day} i:[ {i}] Sell Day: {stockResults.db.stocks[j].Day} {diff}");
+
+                }
+            }
+            BuyStockSellStock BSSS = new BuyStockSellStock();
+            BSSS.buyStock = stockResults.db.stocks[buyDay - 1];
+            BSSS.sellStock = stockResults.db.stocks[sellDay - 1];
+
+
+            Console.WriteLine($"Buy Day: {BSSS.buyStock.Day} Price buy: {BSSS.buyStock.Price}");
+            Console.WriteLine($"Sell Day: {BSSS.sellStock.Day} Price sell: {BSSS.sellStock.Price}");
+            //Console.WriteLine($"A  {buyDay}");
+            //Console.WriteLine($"B  {sellDay}");
+            //Profit = sellStock.Price - buyStock.Price;
+
+            //Console.WriteLine($"Your total earnings are: Sell Price: {sellStock.Price} - Buy Price: {buyStock.Price} = Profit {Profit}");
+        }
+
+        StockResults stockResults;
+        public InvestmentStrategies(StockResults stockResults)
+        {
+            this.stockResults = stockResults;
+        }
     }
 
 }
 
 
 
-    //TOOO: Investment Strategy
+    
 
