@@ -11,6 +11,7 @@ namespace StocksCodingChallenge
     {
         static void Main(string[] args)
         {
+            FileManagement.RequestPath();
 
 
             Database db = new Database();
@@ -41,8 +42,8 @@ namespace StocksCodingChallenge
             Console.WriteLine("-------------------------------------------");
             print.BuySecondLowerDayPrint();
 
-            Console.WriteLine();
-            Console.ReadLine();
+
+            Console.ReadKey();
 
              
         }
@@ -64,12 +65,21 @@ namespace StocksCodingChallenge
 
     public static class FileManagement
     {
-        public static string filePath = @"C:\Users\kalok\Downloads\Computershare - Coding Challenge\ChallengeSampleDataSet1.txt";
+     
+        public static string filePath = "";
+        public static string defaultPath = @"C:\ChallengeSampleDataSet1.txt";
 
         //TODO: Request path from user
         public static void RequestPath()
         {
-            Console.WriteLine("Not yet Implemented");
+            Console.WriteLine(@"Default Directory & File Name: [C:\ChallengeSampleDataSet1.txt]");
+            Console.WriteLine("Press 'Enter' to continue with the default path and file name or enter a specific");
+
+            string consoleReading = Console.ReadLine();
+
+            filePath = consoleReading == "" ? defaultPath : consoleReading;
+
+            Console.WriteLine($"Selected file is: {filePath}");
         }
 
 
@@ -81,14 +91,42 @@ namespace StocksCodingChallenge
         public List<Stock> stocks = new List<Stock>();
         public void AddStocksFromFile()
         {
-            string stockText = File.ReadAllText(FileManagement.filePath);
-
-            string[] stockPrices = stockText.Split(',');
-
-            foreach (var price in stockPrices)
+            //TODO: This should be at file management
+            string stockText ="";
+            try
             {
-                stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
+                stockText = File.ReadAllText(FileManagement.filePath);
             }
+            catch
+            {
+                Console.WriteLine("Error with path!");
+                FileManagement.RequestPath();
+                Console.WriteLine($"Selected file is: {FileManagement.filePath}");
+
+            }
+            
+
+            try
+            {
+                string[] stockPrices = stockText.Split(',');
+
+                foreach (var price in stockPrices)
+                {
+                    stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
+                }
+
+                if (stockPrices.Length == 0)
+                {
+                    Console.WriteLine("No stocks were imported");
+                    //Fix the logic here so whenever a file is read with just one record to request for the path again!
+                    FileManagement.RequestPath();
+                }
+            }
+            catch(Exception e)
+            {
+                //AddStocksFromFile();
+            }
+            
         }
 
         public static Stock AddStock(int day, double price)
@@ -202,7 +240,7 @@ namespace StocksCodingChallenge
             BuyStockSellStockProfit BSSS = investmentStrategies.BuyOneSellOne();
             Console.WriteLine("Printing results for the main strategy");
             Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
-            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Purchase Price: {BSSS.sellStock.Price}");
+            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
             Console.WriteLine($"Profit: {BSSS.Profit()}");
             Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
         }
@@ -211,7 +249,7 @@ namespace StocksCodingChallenge
             BuyStockSellStockProfit BSSS = investmentStrategies.BuySecondLowerDay();
             Console.WriteLine("Printing results for the main strategy");
             Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
-            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Purchase Price: {BSSS.sellStock.Price}");
+            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
             Console.WriteLine($"Profit: {BSSS.Profit()}");
             Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
         }
