@@ -17,7 +17,7 @@ namespace StocksCodingChallenge
             db.AddStocksFromFile();
             StockResults stockResults = new StockResults(db);
             InvestmentStrategies investments = new InvestmentStrategies(stockResults);
-            Print print = new Print(stockResults);
+            Print print = new Print(stockResults, investments);
 
             print.NumberOfStocks();
             Console.WriteLine("-----------------------------------------");
@@ -37,12 +37,11 @@ namespace StocksCodingChallenge
             Console.WriteLine("-----------------------------------------");
             Console.WriteLine("end");
             Console.WriteLine("-----------------------------------------");
-            investments.BuyOneSellOne();
+            print.BuyOneSellOnePrint();
+            Console.WriteLine("-------------------------------------------");
+            print.BuySecondLowerDayPrint();
 
-            Console.WriteLine("Please provide the path or press x for defualt");
-            string newPath = Console.ReadLine();
-            Console.WriteLine(newPath);
-
+            Console.WriteLine();
             Console.ReadLine();
 
              
@@ -67,11 +66,13 @@ namespace StocksCodingChallenge
     {
         public static string filePath = @"C:\Users\kalok\Downloads\Computershare - Coding Challenge\ChallengeSampleDataSet1.txt";
 
-        //TODO:
+        //TODO: Request path from user
         public static void RequestPath()
         {
             Console.WriteLine("Not yet Implemented");
         }
+
+
     }
 
     public class Database
@@ -90,14 +91,21 @@ namespace StocksCodingChallenge
             }
         }
 
-        public Stock AddStock(int day, double price)
+        public static Stock AddStock(int day, double price)
         {
             return new Stock(day, price);
         }
 
-        //TODO: CRUD on Stock
+        public void UpdateStock(Stock stock, int day, double price)
+        {
+            stock.Day = day;
+            stock.Price = price;
+        }
 
-        
+        public void DeleteStock(Stock stock)
+        {
+            stocks.Remove(stock);
+        }
     }
 
     public class StockResults
@@ -188,98 +196,109 @@ namespace StocksCodingChallenge
             }
         }
 
+        //TODO: Print results according to the requirement
+        public void BuyOneSellOnePrint()
+        {
+            BuyStockSellStockProfit BSSS = investmentStrategies.BuyOneSellOne();
+            Console.WriteLine("Printing results for the main strategy");
+            Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
+            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Purchase Price: {BSSS.sellStock.Price}");
+            Console.WriteLine($"Profit: {BSSS.Profit()}");
+            Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
+        }
+        public void BuySecondLowerDayPrint()
+        {
+            BuyStockSellStockProfit BSSS = investmentStrategies.BuySecondLowerDay();
+            Console.WriteLine("Printing results for the main strategy");
+            Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
+            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Purchase Price: {BSSS.sellStock.Price}");
+            Console.WriteLine($"Profit: {BSSS.Profit()}");
+            Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
+        }
+
 
         StockResults stockResults;
-
-        public Print(StockResults stockResults)
+        InvestmentStrategies investmentStrategies;
+        public Print(StockResults stockResults, InvestmentStrategies investmentStrategies = null)
         {
             this.stockResults = stockResults;
+            this.investmentStrategies = investmentStrategies;
         }
 
     }
 
-    struct BuyStockSellStock
+    public struct BuyStockSellStockProfit
     {
         public Stock buyStock;
         public Stock sellStock;
+        public double Profit() => sellStock.Price - buyStock.Price;
+        public BuyStockSellStockProfit(Stock buyStock, Stock sellStock)
+        {
+            this.buyStock = buyStock;
+            this.sellStock = sellStock;
+        }
     }
 
-    class InvestmentStrategies
+    public class InvestmentStrategies
     {
-        public double Profit;
         //Default requirement for buying a single stock and then selling it at the highest possible price
-        
-        public void BuyOneSellOne()
+        public BuyStockSellStockProfit BuyOneSellOne()
         {
-            //Find the Stock with the Lowest Price
-            Stock buyStock = stockResults.StockWithLowerPrice();
-            //Find the Stock with the Higher Price
-            Stock sellStock = stockResults.StockWithHigherPrice();
-           
-            //while (!(buyStock.Day < sellStock.Day))
-            //{
-            //    int buyIndex = 1;
-            //    int sellIndex = 1;
-
-            //    if(buyStock.Day < stockResults.db.stocks.Count)
-            //    {
-            //        buyStock = stockResults.StocksByPriceAsc()[buyIndex++];
-            //        possibleProfitA = sellStock.Price - buyStock.Price;
-            //    }
-            //    else
-            //    {
-            //        buyStock = stockResults.StockWithLowerPrice();
-            //        sellStock = stockResults.StocksByPriceDesc()[sellIndex++];
-            //        possibleProfitB = sellStock.Price - buyStock.Price;
-
-            //    }
-            //    //sellStock = stockResults.StocksByPriceDesc()[sellIndex++];
-            //}
-
+            return BuyOneSellOneFromDay(0);
+        }
+         public BuyStockSellStockProfit BuyOneSellOneFromDay(int startBuyDay)
+        {
             double maxDiff = 0;
             int buyDay = 0;
             int sellDay = 0;
-            for (int i = 0; i < stockResults.db.stocks.Count(); i++) //Buy
+            for (int i = startBuyDay; i < stockResults.db.stocks.Count(); i++) //Buy Day
             {
-                
-                for (int j = i+1; j < stockResults.db.stocks.Count(); j++) //Sell
+                for (int j = i+1; j < stockResults.db.stocks.Count(); j++) //Sell Day
                 {
                     double diff = stockResults.db.stocks[j].Price - stockResults.db.stocks[i].Price;
                     
-
-                    //if (maxDiff < diff) maxDiff = diff; buyDay = i; sellDay = j;
-
                     if (maxDiff < diff)
                     {
                         maxDiff = diff;
                         buyDay = i+1;
                         sellDay = j+1;
                     }
-
-                    Console.WriteLine($"Profit: Buy Day: {stockResults.db.stocks[i].Day} i:[ {i}] Sell Day: {stockResults.db.stocks[j].Day} {diff}");
-
                 }
             }
-            BuyStockSellStock BSSS = new BuyStockSellStock();
-            BSSS.buyStock = stockResults.db.stocks[buyDay - 1];
-            BSSS.sellStock = stockResults.db.stocks[sellDay - 1];
 
 
-            Console.WriteLine($"Buy Day: {BSSS.buyStock.Day} Price buy: {BSSS.buyStock.Price}");
-            Console.WriteLine($"Sell Day: {BSSS.sellStock.Day} Price sell: {BSSS.sellStock.Price}");
-            //Console.WriteLine($"A  {buyDay}");
-            //Console.WriteLine($"B  {sellDay}");
-            //Profit = sellStock.Price - buyStock.Price;
+            Stock buyStock = stockResults.db.stocks[buyDay - 1];
+            Stock sellStock = stockResults.db.stocks[sellDay - 1];
 
-            //Console.WriteLine($"Your total earnings are: Sell Price: {sellStock.Price} - Buy Price: {buyStock.Price} = Profit {Profit}");
+            BuyStockSellStockProfit BSSS = new BuyStockSellStockProfit(buyStock, sellStock);
+
+            return BSSS;
         }
+        //TODO: Update the following description 
+        /* Now let's take the scenario of not being able to afford the stock on the day of the lowest price.
+           So, we will have to purchase the stock on the next possible day with the lowest price.
+        
+           This strategy similar to the first will:
+         * Buy a Stock in one of the following days the lowest price was observed
+         * Sell the stock on the day the highest possible price was observerd
+         
+         */
+        
+        public BuyStockSellStockProfit BuySecondLowerDay()
+        {
+            return BuyOneSellOneFromDay(BuyOneSellOne().buyStock.Day + 1);
+        }
+
 
         StockResults stockResults;
         public InvestmentStrategies(StockResults stockResults)
         {
             this.stockResults = stockResults;
         }
+
+
     }
+
 
 }
 
