@@ -11,46 +11,7 @@ namespace StocksCodingChallenge
     {
         static void Main(string[] args)
         {
-
             App.Start();
-
-            //FileManagement.RequestPath();
-
-
-            //Database db = new Database();
-            //db.AddStocksFromFile();
-            //StockResults stockResults = new StockResults(db);
-            //InvestmentStrategies investments = new InvestmentStrategies(stockResults);
-            //Print print = new Print(stockResults, investments);
-
-
-            //Console.WriteLine("-----------------------------------------");
-            //print.NumberOfStocks();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintAllStocks();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintHigherPrice();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintLowerPrice();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintHigherStock();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintLowerStock();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintStocksByPriceDesc();
-            //Console.WriteLine("-----------------------------------------");
-            //print.PrintStocksByPriceAsc();
-            //Console.WriteLine("-----------------------------------------");
-            //Console.WriteLine("end");
-            //Console.WriteLine("-----------------------------------------");
-            //print.BuyOneSellOnePrint();
-            //Console.WriteLine("-------------------------------------------");
-            //print.BuySecondLowerDayPrint();
-
-
-            Console.ReadKey();
-
-             
         }
 
     }
@@ -60,35 +21,155 @@ namespace StocksCodingChallenge
         public static void Start()
         {
             About();
-            MainMenu();
-        }
-
-        public static void MainMenu()
-        {
             FileManagement.RequestPath();
+
             FileManagement.PrintPath();
 
+            Database db = new Database();
+            db.AddStocksFromFile();
+
+            StockResults stockResults = new StockResults(db);
+
+            InvestmentStrategies investmentStr = new InvestmentStrategies(stockResults);
+
+            Print print = new Print(stockResults, investmentStr);
+
+            MainMenu(stockResults, investmentStr, print);
+        }
+
+        public static void MainMenu(StockResults sr, InvestmentStrategies ins, Print pr)
+        {
             MainMenuOptions();
-            
+
             string menuOption = Console.ReadLine();
-            while (!(menuOption == "1" || menuOption == "2" || menuOption == "3"))
+
+            while (!(menuOption == "1" || menuOption == "2" || menuOption == "3" || menuOption == "4"))
             {
                 MainMenuOptions();
                 menuOption = Console.ReadLine();
             }
 
-            Console.WriteLine(menuOption);
-            
-
+            switch (menuOption)
+            {
+                case "1":
+                    ImplementMainStrategy(pr);
+                    break;
+                case "2":
+                    ImplementAlternativeStrategy(pr);
+                    break;
+                case "3":
+                    PrintMenu(pr, sr, ins);
+                    break;
+                case "4":
+                    About();
+                    MainMenu(sr, ins, pr);
+                    break;
+                default:
+                    break;
+            }
 
         }
 
         public static void MainMenuOptions()
         {
-            Console.WriteLine("\tPlease select one of the following options:\n");
-            Console.WriteLine("\t1 - Implement Default Investment Strategy");
-            Console.WriteLine("\t2 - Implement Alternative Investment Strategy");
-            Console.WriteLine("\t3 - View this author's details");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("\t\tPlease select one of the following options:\n");
+            Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\t1 - Implement Default Investment Strategy");
+            Console.WriteLine("\t\t2 - Implement Alternative Investment Strategy");
+            Console.WriteLine("\t\t3 - Dataset views");
+            Console.WriteLine("\t\t4 - View the author's details");
+            Console.ResetColor();
+        }
+
+        public static void ImplementMainStrategy(Print print)
+        {
+            print.BuyOneSellOnePrint();
+        }
+
+        public static void ImplementAlternativeStrategy(Print print)
+        {
+            print.BuySecondLowerDayPrint();
+        }
+
+        public static void PrintMenu(Print print, StockResults sr, InvestmentStrategies ins)
+        {
+            PrintMenuOptions();
+            string selectedOption = "";
+
+            while (!(selectedOption == "1" || selectedOption == "2" || selectedOption == "3" || selectedOption == "4" || selectedOption == "5" ||
+                     selectedOption == "6" || selectedOption == "7" || selectedOption == "8"))
+            {
+                selectedOption = Console.ReadLine();
+            }
+
+            switch (selectedOption)
+            {
+                case "1":
+                    print.NumberOfStocks();
+                    break;
+                case "2":
+                    print.PrintAllStocks();
+                    break;
+                case "3":
+                    print.PrintLowerPrice();
+                    break;
+                case "4":
+                    print.PrintHigherPrice();
+                    break;
+                case "5":
+                    print.PrintLowerStock();
+                    break;
+                case "6":
+                    print.PrintHigherStock();
+                    break;
+                case "7":
+                    print.PrintStocksByPriceAsc();
+                    break;
+                case "8":
+                    print.PrintStocksByPriceDesc();
+                    break;
+                case "9":
+                    MainMenu(sr, ins, print);
+                    break;
+                default:
+                    MainMenu(sr, ins, print);
+                    break;
+            }
+
+            ReturnToPrintOrExit(print, sr, ins);
+        }
+
+        public static void ReturnToPrintOrExit(Print print, StockResults sr, InvestmentStrategies ins)
+        {
+            Console.WriteLine("Press 'b' to return or any key to exit");
+            string option = Console.ReadLine();
+            if (option == "b") PrintMenu(print, sr, ins);
+        }
+
+        public static void PrintMenuOptions()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("\t\tPlease select one of the following view options:");
+            Console.ResetColor();
+
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine("\n\t\t1 - Total number of imported stocks");
+            Console.WriteLine("\t\t2 - All stocks: Default order");
+            Console.WriteLine("\t\t3 - Lower price in the dataset");
+            Console.WriteLine("\t\t4 - Higher price in the dataset");
+            Console.WriteLine("\t\t5 - Stock with the lower price");
+            Console.WriteLine("\t\t6 - Stock with the higher price");
+            Console.WriteLine("\t\t7 - All stocks:Order by price ascending");
+            Console.WriteLine("\t\t8 - All stocks:Order by price descending");
+
+            Console.WriteLine("\n\t\t9 - Return to the Main Menu");
+
+            Console.ResetColor();
+
         }
 
         public static void About()
@@ -103,7 +184,6 @@ namespace StocksCodingChallenge
             Console.WriteLine("\t\t\tPress 'Enter' to continue");
             Console.ReadLine();
         }
-
 
 
     }
@@ -123,7 +203,7 @@ namespace StocksCodingChallenge
 
     public static class FileManagement
     {
-     
+
         public static string filePath = "";
         public static string defaultPath = @"C:\ChallengeSampleDataSet1.txt";
         public static string stockText = "";
@@ -151,7 +231,7 @@ namespace StocksCodingChallenge
             try
             {
                 stockText = File.ReadAllText(FileManagement.filePath);
-            } 
+            }
             catch
             {
                 Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -162,7 +242,7 @@ namespace StocksCodingChallenge
                 FileManagement.RequestPath();
             }
 
-            
+
         }
 
         public static void PrintPath()
@@ -211,10 +291,10 @@ namespace StocksCodingChallenge
                     FileManagement.RequestPath();
                     AddStocksFromFile();
                 }
-               
+
             }
 
-            
+
 
         }
 
@@ -262,7 +342,7 @@ namespace StocksCodingChallenge
 
 
         public Database db;
-        
+
         public StockResults(Database database)
         {
             db = database;
@@ -274,60 +354,86 @@ namespace StocksCodingChallenge
     {
         public void NumberOfStocks()
         {
-            Console.WriteLine($"Total number of stocks read from the database: {stockResults.TotalStocks()}");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Total number of stocks read from the file: {stockResults.TotalStocks()}");
+            Console.ResetColor();
         }
         public void PrintAllStocks()
         {
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("Printing all stocks with the default order");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.Green;
             foreach (Stock stock in stockResults.db.stocks)
             {
-                Console.WriteLine($"Stock Day: {stock.Day} - Stock Price: {stock.Price}");
+                Console.WriteLine($"Stock[Day: {stock.Day} - Stock Price: {stock.Price}]");
             }
+            Console.ResetColor();
         }
+
         public void PrintLowerPrice()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"The lower price is: {stockResults.minPrice()}");
+            Console.ResetColor();
         }
 
         public void PrintHigherPrice()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"The highest price is: {stockResults.maxPrice()}");
+            Console.ResetColor();
         }
 
         public void PrintLowerStock()
         {
-            Console.WriteLine($"Day with lower price: {stockResults.StockWithLowerPrice().Day}, Price on that day: {stockResults.StockWithLowerPrice().Price}"); 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Day with lower price: {stockResults.StockWithLowerPrice().Day}, Price on that day: {stockResults.StockWithLowerPrice().Price}");
+            Console.ResetColor();
         }
 
         public void PrintHigherStock()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Day with higher price: {stockResults.StockWithHigherPrice().Day}, Price on that day: {stockResults.StockWithHigherPrice().Price}");
+            Console.ResetColor();
         }
 
         public void PrintStocksByPriceAsc()
         {
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("Printing all stocks by Price Ascending \n ");
+            Console.ResetColor();
+
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             foreach (var stock in stockResults.StocksByPriceAsc())
             {
                 Console.WriteLine($"Price {stock.Price}, Day {stock.Day}");
             }
+            Console.ResetColor();
+
         }
 
         public void PrintStocksByPriceDesc()
         {
-            Console.WriteLine("Printing all stocks by Price Descending \n ");
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("Printing all stocks by Price Descending\n");
+            Console.ResetColor();
 
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             foreach (var stock in stockResults.StocksByPriceDesc())
             {
                 Console.WriteLine($"Price {stock.Price}, Day {stock.Day}");
             }
+            Console.ResetColor();
         }
 
         //TODO: Print results according to the requirement
         public void BuyOneSellOnePrint()
-        { 
+        {
             BuyStockSellStockProfit BSSS = investmentStrategies.BuyOneSellOne();
-            if(BSSS.buyStock != null && BSSS.sellStock != null && BSSS.Profit() > 0)
+            if (BSSS.buyStock != null && BSSS.sellStock != null && BSSS.Profit() > 0)
             {
                 Console.WriteLine("Printing results for the main strategy");
                 Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
@@ -379,26 +485,27 @@ namespace StocksCodingChallenge
         {
             return BuyOneSellOneFromDay(0);
         }
-         public BuyStockSellStockProfit BuyOneSellOneFromDay(int startBuyDay)
+        public BuyStockSellStockProfit BuyOneSellOneFromDay(int startBuyDay)
         {
             double maxDiff = 0;
             int buyDay = 0;
             int sellDay = 0;
-            try { 
-            for (int i = startBuyDay; i < stockResults.db.stocks.Count(); i++) //Buy Day
+            try
             {
-                for (int j = i+1; j < stockResults.db.stocks.Count(); j++) //Sell Day
+                for (int i = startBuyDay; i < stockResults.db.stocks.Count(); i++) //Buy Day
                 {
-                    double diff = stockResults.db.stocks[j].Price - stockResults.db.stocks[i].Price;
-                    
-                    if (maxDiff < diff)
+                    for (int j = i + 1; j < stockResults.db.stocks.Count(); j++) //Sell Day
                     {
-                        maxDiff = diff;
-                        buyDay = i+1;
-                        sellDay = j+1;
+                        double diff = stockResults.db.stocks[j].Price - stockResults.db.stocks[i].Price;
+
+                        if (maxDiff < diff)
+                        {
+                            maxDiff = diff;
+                            buyDay = i + 1;
+                            sellDay = j + 1;
+                        }
                     }
                 }
-            }
 
                 Stock buyStock = stockResults.db.stocks[buyDay - 1];
                 Stock sellStock = stockResults.db.stocks[sellDay - 1];
@@ -409,13 +516,13 @@ namespace StocksCodingChallenge
             }
             catch
             {
-                     //TODO: Add a validation so this runs only if there are at least 2 stocks in the database
-                    Console.WriteLine("Investment cannot be implemented with one stock");
+                //TODO: Add a validation so this runs only if there are at least 2 stocks in the database
+                Console.WriteLine("Investment cannot be implemented with one stock");
                 FileManagement.RequestPath();
             }
 
 
-           return new BuyStockSellStockProfit(null,null);
+            return new BuyStockSellStockProfit(null, null);
         }
         //TODO: Update the following description 
         /* Now let's take the scenario of not being able to afford the stock on the day of the lowest price.
@@ -426,7 +533,7 @@ namespace StocksCodingChallenge
          * Sell the stock on the day the highest possible price was observerd
          
          */
-        
+
         public BuyStockSellStockProfit BuySecondLowerDay()
         {
             return BuyOneSellOneFromDay(BuyOneSellOne().buyStock.Day + 1);
@@ -447,5 +554,5 @@ namespace StocksCodingChallenge
 
 
 
-    
+
 
