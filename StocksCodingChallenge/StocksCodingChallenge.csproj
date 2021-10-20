@@ -43,8 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App.cs" />
+    <Compile Include="BuyStockSellStockProfit.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="FileManagement.cs" />
+    <Compile Include="InvestmentStrategies.cs" />
+    <Compile Include="Print.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stock.cs" />
+    <Compile Include="StockResults.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
