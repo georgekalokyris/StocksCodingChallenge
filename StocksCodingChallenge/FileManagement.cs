@@ -10,7 +10,6 @@ namespace StocksCodingChallenge
         public static string defaultPath = @"C:\ChallengeSampleDataSet1.txt";
         public static string stockText = "";
 
-        //TODO: Customise this better with colors
         public static void RequestPath()
         {
 

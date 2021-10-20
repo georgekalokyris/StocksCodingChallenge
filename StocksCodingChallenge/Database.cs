@@ -7,18 +7,14 @@ namespace StocksCodingChallenge
     {
 
         public List<Stock> stocks = new List<Stock>();
-        public string[] stockPrices;
+
         public void AddStocksFromFile()
         {
+            string[] stockPrices = null;
             try
             {
                 stockPrices = FileManagement.stockText.Split(',');
-
-                foreach (var price in stockPrices)
-                {
-                    stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
-                }
-
+                AddStocksFromArray(stockPrices);
             }
             catch
             {
@@ -30,7 +26,9 @@ namespace StocksCodingChallenge
                     Console.WriteLine(".");
                     Console.WriteLine(".");
                     Console.WriteLine(".");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Returning to path selection");
+                    Console.ResetColor();
                     Console.WriteLine(".");
                     Console.WriteLine(".");
                     Console.WriteLine(".");
@@ -38,11 +36,18 @@ namespace StocksCodingChallenge
                     FileManagement.RequestPath();
                     AddStocksFromFile();
                 }
+            }
+        }
+        public bool AddStocksFromArray(string[] stockPrices)
+        {
+            if (stockPrices.Length == 0) return false;
 
+            foreach (var price in stockPrices)
+            {
+                stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
             }
 
-
-
+            return true;
         }
 
         public static Stock AddStock(int day, double price)

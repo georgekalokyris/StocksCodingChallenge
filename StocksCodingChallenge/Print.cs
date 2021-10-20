@@ -84,7 +84,11 @@ namespace StocksCodingChallenge
         public void BuyOneSellOnePrint()
         {
             BuyStockSellStockProfit BSSS = investmentStrategies.BuyOneSellOne();
-            if (BSSS.buyStock != null && BSSS.sellStock != null)
+            if (BSSS.Profit == 0)
+            {
+                Console.WriteLine("There is no profitable strategy");
+            }
+            else if (BSSS.buyStock != null && BSSS.sellStock != null)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGreen;
                 Console.ForegroundColor = ConsoleColor.Black;
@@ -94,7 +98,7 @@ namespace StocksCodingChallenge
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
                 Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
-                Console.WriteLine($"Profit: {BSSS.Profit()}");
+                Console.WriteLine($"Profit: {BSSS.Profit}");
                 Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
                 Console.ResetColor();
             }
@@ -107,7 +111,12 @@ namespace StocksCodingChallenge
         public void BuySecondLowerDayPrint()
         {
             BuyStockSellStockProfit BSSS = investmentStrategies.BuySecondLowerDay();
-            if (BSSS.buyStock != null && BSSS.sellStock != null)
+
+            if (BSSS.Profit == 0)
+            {
+                Console.WriteLine("There is no profitable strategy");
+            }
+            else if (BSSS.buyStock != null && BSSS.sellStock != null)
             {
                 Console.BackgroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("Printing results for the alternative strategy");
@@ -116,7 +125,7 @@ namespace StocksCodingChallenge
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
                 Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
-                Console.WriteLine($"Profit: {BSSS.Profit()}");
+                Console.WriteLine($"Profit: {BSSS.Profit}");
                 Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
                 Console.ResetColor();
             }
