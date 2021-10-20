@@ -52,10 +52,10 @@ namespace StocksCodingChallenge
             switch (menuOption)
             {
                 case "1":
-                    ImplementMainStrategy(pr);
+                    ImplementMainStrategy(pr, ins, sr);
                     break;
                 case "2":
-                    ImplementAlternativeStrategy(pr);
+                    ImplementAlternativeStrategy(pr, ins, sr);
                     break;
                 case "3":
                     PrintMenu(pr, sr, ins);
@@ -83,14 +83,16 @@ namespace StocksCodingChallenge
             Console.ResetColor();
         }
 
-        public static void ImplementMainStrategy(Print print)
+        public static void ImplementMainStrategy(Print print, InvestmentStrategies inv, StockResults sr)
         {
             print.BuyOneSellOnePrint();
+            ReturnToMainMenuOrExit(sr, inv, print);
         }
 
-        public static void ImplementAlternativeStrategy(Print print)
+        public static void ImplementAlternativeStrategy(Print print, InvestmentStrategies inv, StockResults sr)
         {
             print.BuySecondLowerDayPrint();
+            ReturnToMainMenuOrExit(sr, inv, print);
         }
 
         public static void PrintMenu(Print print, StockResults sr, InvestmentStrategies ins)
@@ -99,10 +101,12 @@ namespace StocksCodingChallenge
             string selectedOption = "";
 
             while (!(selectedOption == "1" || selectedOption == "2" || selectedOption == "3" || selectedOption == "4" || selectedOption == "5" ||
-                     selectedOption == "6" || selectedOption == "7" || selectedOption == "8"))
+                     selectedOption == "6" || selectedOption == "7" || selectedOption == "8" || selectedOption == "9"))
             {
                 selectedOption = Console.ReadLine();
             }
+
+            bool returnToMainMenu = false;
 
             switch (selectedOption)
             {
@@ -131,12 +135,11 @@ namespace StocksCodingChallenge
                     print.PrintStocksByPriceDesc();
                     break;
                 case "9":
-                    MainMenu(sr, ins, print);
-                    break;
-                default:
-                    MainMenu(sr, ins, print);
+                    returnToMainMenu = true;
                     break;
             }
+
+            if (returnToMainMenu) MainMenu(sr, ins, print);
 
             ReturnToPrintOrExit(print, sr, ins);
         }
@@ -147,6 +150,14 @@ namespace StocksCodingChallenge
             string option = Console.ReadLine();
             if (option == "b") PrintMenu(print, sr, ins);
         }
+
+        public static void ReturnToMainMenuOrExit(StockResults sr, InvestmentStrategies ins, Print pr)
+        {
+            Console.WriteLine("Press 'b' to return or any key to exit");
+            string option = Console.ReadLine();
+            if (option == "b") MainMenu(sr, ins, pr);
+        }
+
 
         public static void PrintMenuOptions()
         {
@@ -433,28 +444,47 @@ namespace StocksCodingChallenge
         public void BuyOneSellOnePrint()
         {
             BuyStockSellStockProfit BSSS = investmentStrategies.BuyOneSellOne();
-            if (BSSS.buyStock != null && BSSS.sellStock != null && BSSS.Profit() > 0)
+            if (BSSS.buyStock != null && BSSS.sellStock != null)
             {
+                Console.BackgroundColor = ConsoleColor.DarkGreen;
+                Console.ForegroundColor = ConsoleColor.Black;
                 Console.WriteLine("Printing results for the main strategy");
+                Console.ResetColor();
+
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
                 Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
                 Console.WriteLine($"Profit: {BSSS.Profit()}");
                 Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
+                Console.ResetColor();
             }
-
-
+            else
+            {
+                Console.WriteLine("The selected strategy cannot be implemented");
+            }
 
         }
         public void BuySecondLowerDayPrint()
         {
             BuyStockSellStockProfit BSSS = investmentStrategies.BuySecondLowerDay();
-            Console.WriteLine("Printing results for the alternative strategy");
-            Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
-            Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
-            Console.WriteLine($"Profit: {BSSS.Profit()}");
-            Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
-        }
+            if (BSSS.buyStock != null && BSSS.sellStock != null)
+            {
+                Console.BackgroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("Printing results for the alternative strategy");
+                Console.ResetColor();
 
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Stock Purchase Day: {BSSS.buyStock.Day} || Stock Purchase Price: {BSSS.buyStock.Price}");
+                Console.WriteLine($"Stock Sell Day: {BSSS.sellStock.Day} || Stock Sell Price: {BSSS.sellStock.Price}");
+                Console.WriteLine($"Profit: {BSSS.Profit()}");
+                Console.WriteLine($"\n{BSSS.buyStock.Day}({BSSS.buyStock.Price}),{BSSS.sellStock.Day}({BSSS.sellStock.Price})");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.WriteLine("The selected strategy cannot be implemented");
+            }
+        }
 
         StockResults stockResults;
         InvestmentStrategies investmentStrategies;
@@ -527,11 +557,11 @@ namespace StocksCodingChallenge
         //TODO: Update the following description 
         /* Now let's take the scenario of not being able to afford the stock on the day of the lowest price.
            So, we will have to purchase the stock on the next possible day with the lowest price.
-        
+
            This strategy similar to the first will:
          * Buy a Stock in one of the following days the lowest price was observed
          * Sell the stock on the day the highest possible price was observerd
-         
+
          */
 
         public BuyStockSellStockProfit BuySecondLowerDay()
