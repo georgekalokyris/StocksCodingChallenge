@@ -17,6 +17,7 @@ namespace StocksCodingChallenge
             Console.ResetColor();
 
             Console.ForegroundColor = ConsoleColor.Green;
+
             foreach (Stock stock in stockResults.db.stocks)
             {
                 Console.WriteLine($"Stock[Day: {stock.Day} - Stock Price: {stock.Price}]");

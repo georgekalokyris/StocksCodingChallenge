@@ -10,9 +10,7 @@
             this.buyStock = buyStock;
             this.sellStock = sellStock;
         }
-       
     }
-
 
 }
 

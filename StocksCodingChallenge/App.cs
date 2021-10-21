@@ -182,9 +182,7 @@ namespace StocksCodingChallenge
             Console.ReadLine();
         }
 
-
     }
-
 
 }
 

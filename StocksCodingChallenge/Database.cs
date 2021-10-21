@@ -5,9 +5,7 @@ namespace StocksCodingChallenge
 {
     public class Database
     {
-
         public List<Stock> stocks = new List<Stock>();
-
         public void AddStocksFromFile()
         {
             string[] stockPrices = null;
@@ -44,23 +42,16 @@ namespace StocksCodingChallenge
 
             foreach (var price in stockPrices)
             {
-                stocks.Add(AddStock(stocks.Count + 1, Convert.ToDouble(price)));
+                stocks.Add(new Stock(stocks.Count + 1, Convert.ToDouble(price)));
             }
 
             return true;
         }
-
-        public static Stock AddStock(int day, double price)
+            
+        public void AddStock(Stock stock)
         {
-            return new Stock(day, price);
+            stocks.Add(stock);
         }
-
-        public void UpdateStock(Stock stock, int day, double price)
-        {
-            stock.Day = day;
-            stock.Price = price;
-        }
-
         public void DeleteStock(Stock stock)
         {
             stocks.Remove(stock);
